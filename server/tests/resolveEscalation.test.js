@@ -76,7 +76,8 @@ describe('extend the deadline', () => {
     const res = await resolve('supervisor1', id, { action: 'extend', newDueAt, reason: 'Parts are on order' });
     expect(res.status).toBe(200);
     expect(res.body.complaint).toMatchObject({ status: 'ASSIGNED', assignee: { name: 'Suresh Patil' }, escalationLevel: 0 });
-    expect(new Date(res.body.complaint.dueAt).getTime()).toBe(Math.floor(new Date(newDueAt).getTime() / 1000) * 1000);
+    // MySQL stores whole seconds (rounded), so allow one second of difference
+    expect(Math.abs(new Date(res.body.complaint.dueAt).getTime() - new Date(newDueAt).getTime())).toBeLessThanOrEqual(1000);
     expect(res.body.complaint.statusHistory.at(-1).remarks).toBe('Deadline extended: Parts are on order');
     expect((await notificationsOf(id)).at(-1)).toMatchObject({ email: 'plumber1@nmims.edu' });
     // work restarts from ASSIGNED

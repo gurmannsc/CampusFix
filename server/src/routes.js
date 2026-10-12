@@ -9,6 +9,7 @@ import { AuthController } from './controllers/AuthController.js';
 import { ComplaintController } from './controllers/ComplaintController.js';
 import { AssignmentController } from './controllers/AssignmentController.js';
 import { ResolutionController } from './controllers/ResolutionController.js';
+import { AdminController } from './controllers/AdminController.js';
 
 export const router = Router();
 const handler = asyncHandler;
@@ -48,3 +49,6 @@ router.post('/complaints/:id/resolve', requireRole(...workers), handler(Resoluti
 router.post('/complaints/:id/confirm', requireRole(...CAMPUS_USER_ROLES), handler(ResolutionController.confirm));
 router.post('/complaints/:id/reject', requireRole(...CAMPUS_USER_ROLES), handler(ResolutionController.reject));
 router.post('/complaints/:id/resolve-escalation', requireRole(...handlers), handler(AssignmentController.resolveEscalation));
+
+// M6: DEMO ONLY. Runs the deadline check now instead of waiting for the timer.
+router.post('/admin/run-deadline-check', requireRole(Role.ADMIN), handler(AdminController.runDeadlineCheck));

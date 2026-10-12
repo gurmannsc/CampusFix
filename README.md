@@ -45,3 +45,19 @@ Log in with `<username>@nmims.edu` and password `demo123`. Usernames: `student1`
 `student3`, `faculty1`, `faculty2`, `supervisor1`, `admin1`, and staff `electrician1`,
 `plumber1`, `carpenter1`, `hvac1`, `hvac2`, `hvac3` (marked unavailable), `itsupport1`, `civil1`,
 `housekeeper1`.
+
+## Deadline timer and the demo button
+
+The server checks deadlines every `DEADLINE_CHECK_MINUTES` minutes (default 15): overdue complaints are
+escalated, escalations repeat every 24 hours (the Administrator is told from level 2), and resolved
+complaints nobody answered for 48 hours are closed.
+
+For the live demo set `DEADLINE_CHECK_MINUTES=0` in `server/.env` (timer off), run `npm run reset-demo`,
+and use the admin1 button "Run deadline check" (`POST /api/admin/run-deadline-check`) so the escalation
+happens in front of the examiner instead of at the next timer tick.
+
+## Tests
+
+```bash
+npm test      # needs the database from `npm run setup`; uses the separate campusfix_test database
+```

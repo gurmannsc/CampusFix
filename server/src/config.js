@@ -16,7 +16,9 @@ export const config = {
   // Browser origin allowed to call the API (the Vite dev server).
   clientOrigin: process.env.CLIENT_ORIGIN || 'http://localhost:5173',
   // How often EscalationScheduler runs checkDeadlines (docs/01: every 15 minutes, configurable).
-  deadlineCheckMinutes: Number(process.env.DEADLINE_CHECK_MINUTES) || 15,
+  // 0 switches the automatic timer off; the admin "run deadline check" button still works (use for the live demo).
+  deadlineCheckMinutes: process.env.DEADLINE_CHECK_MINUTES == null || process.env.DEADLINE_CHECK_MINUTES === ''
+    ? 15 : Number(process.env.DEADLINE_CHECK_MINUTES),
   db: {
     host: process.env.DB_HOST || '127.0.0.1',
     port: Number(process.env.DB_PORT) || 3306,
