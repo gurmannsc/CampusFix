@@ -31,3 +31,11 @@ export class ValidationError extends DomainError {
     super(message, 400, details);
   }
 }
+
+// Missing, invalid or expired credentials (HTTP 401). 403 (ForbiddenActionError) means
+// "known user, not allowed".
+export class UnauthorizedError extends DomainError {
+  constructor(message = 'Authentication required') {
+    super(message, 401);
+  }
+}

@@ -9,13 +9,14 @@
     "start": "node src/server.js",
     "setup": "node db/setup.js",
     "reset-demo": "node db/reset-demo.js",
-    "test": "node --experimental-vm-modules ../node_modules/jest/bin/jest.js"
+    "test": "node --experimental-vm-modules ../node_modules/jest/bin/jest.js --runInBand"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.3",
     "mysql2": "^3.24.5"
   },
   "devDependencies": {

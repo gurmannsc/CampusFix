@@ -22,3 +22,6 @@ export const OPEN_STATES = Object.freeze([
 
 // The Timer (node-cron) is a non-human actor; it is the only "who" for rows 11, 12 and 13.
 export const TIMER = Object.freeze({ role: 'TIMER', userId: null });
+
+// Roles that are CampusUsers (they raise complaints and confirm or reject fixes).
+export const CAMPUS_USER_ROLES = Object.freeze([Role.STUDENT, Role.FACULTY]);

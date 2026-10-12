@@ -29,5 +29,10 @@ export const config = {
     adminUser: process.env.DB_ADMIN_USER || 'root',
     adminPassword: process.env.DB_ADMIN_PASSWORD || '',
   },
+  jwt: {
+    // Required to run the server (checked in server.js). Tests get a fixed secret.
+    secret: process.env.JWT_SECRET || (process.env.NODE_ENV === 'test' ? 'test-only-secret' : ''),
+    expiresIn: process.env.JWT_EXPIRES_IN || '8h',
+  },
   uploadsDir: path.join(serverRoot, 'uploads'),
 };
