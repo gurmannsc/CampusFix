@@ -54,6 +54,6 @@ it against the report's UML diagrams. Faithfulness to the design matters more th
   suggested split. Commits should be made under the name of whoever owns that milestone.
 
 ## Commands (fill in once scaffolded)
-- setup:  (to be added in milestone M1)
+- setup:  `npm run setup` (create + seed DB); `npm run reset-demo` (restore demo state)
 - dev:    `npm run dev` from the repo root (server :4000, client :5173)
 - test:   (to be added in milestone M2)
