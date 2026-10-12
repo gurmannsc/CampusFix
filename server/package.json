@@ -8,7 +8,8 @@
     "dev": "nodemon src/server.js",
     "start": "node src/server.js",
     "setup": "node db/setup.js",
-    "reset-demo": "node db/reset-demo.js"
+    "reset-demo": "node db/reset-demo.js",
+    "test": "node --experimental-vm-modules ../node_modules/jest/bin/jest.js"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
@@ -18,6 +19,15 @@
     "mysql2": "^3.24.5"
   },
   "devDependencies": {
-    "nodemon": "^3.1.9"
+    "jest": "^30.5.2",
+    "nodemon": "^3.1.9",
+    "supertest": "^7.3.1"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "transform": {},
+    "testMatch": [
+      "**/tests/**/*.test.js"
+    ]
   }
 }

@@ -56,4 +56,4 @@ it against the report's UML diagrams. Faithfulness to the design matters more th
 ## Commands (fill in once scaffolded)
 - setup:  `npm run setup` (create + seed DB); `npm run reset-demo` (restore demo state)
 - dev:    `npm run dev` from the repo root (server :4000, client :5173)
-- test:   (to be added in milestone M2)
+- test:   `npm test` from the repo root (Jest; domain tests need no database)
