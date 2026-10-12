@@ -1,0 +1,39 @@
+@startuml seq_escalate
+!include seqstyle.iuml
+mainframe sd Escalate Overdue Complaint
+participant ":Timer" as T <<actor>>
+participant "sch : EscalationScheduler" as S
+participant "list : ComplaintList" as L
+participant "c : Complaint" as CP
+participant "ns : NotificationService" as N
+
+T -> S : checkDeadlines(now)
+activate S
+S -> L : findOverdue(now)
+activate L
+L -->> S : overdueComplaints
+deactivate L
+loop for each c in overdueComplaints
+  S -> CP : escalate()
+  activate CP
+  create participant "e : Escalation" as E
+  CP -->> E : <<create>>(level, reason)
+  CP -->> S : e
+  deactivate CP
+  S -> E : notifyResponsible()
+  activate E
+  E -> N : send(supervisorId, "Complaint overdue")
+  activate N
+  N -->> E
+  deactivate N
+  opt level >= 2
+    E -> N : send(adminId, "Complaint overdue")
+    activate N
+    N -->> E
+    deactivate N
+  end
+  E -->> S
+  deactivate E
+end
+deactivate S
+@enduml

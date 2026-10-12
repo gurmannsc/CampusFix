@@ -1,0 +1,12 @@
+skinparam monochrome true
+skinparam shadowing false
+skinparam defaultFontName "Arial"
+skinparam defaultFontSize 13
+skinparam backgroundColor white
+skinparam ActivityBarColor black
+skinparam ActivityBackgroundColor white
+skinparam ActivityDiamondBackgroundColor white
+skinparam ActivityStartColor black
+skinparam ActivityEndColor black
+skinparam ArrowColor black
+skinparam ActivityBorderColor black

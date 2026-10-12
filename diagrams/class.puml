@@ -1,0 +1,177 @@
+@startuml class
+!include style.iuml
+hide circle
+hide empty members
+skinparam classAttributeIconSize 0
+skinparam classBackgroundColor white
+skinparam classBorderColor black
+skinparam classFontStyle bold
+skinparam nodesep 70
+skinparam ranksep 55
+
+abstract class User {
+  - userId : int
+  - name : String
+  - email : String
+  - phone : String
+  - passwordHash : String
+  + login(email, password) : boolean
+  + logout() : void
+  + viewNotifications() : Notification[0..*]
+}
+abstract class CampusUser {
+  + raiseComplaint(details) : Complaint
+  + trackComplaint(complaintId) : ComplaintStatus
+  + confirmResolution(complaintId, rating) : void
+  + rejectResolution(complaintId, reason) : void
+}
+class Student {
+  - sapId : String
+  - program : String
+  - hostelRoom : String
+}
+class Faculty {
+  - employeeId : String
+  - department : String
+}
+class MaintenanceStaff {
+  - trade : String
+  - isAvailable : boolean
+  + viewAssignedComplaints() : Complaint[0..*]
+  + updateWorkStatus(complaintId, status) : void
+  + markResolved(complaintId, remarks) : void
+}
+class MaintenanceSupervisor {
+  + setPriority(complaintId, priority) : void
+  + assignComplaint(complaintId, staffId) : void
+  + markInvalid(complaintId, reason) : void
+  + handleEscalation(escalationId) : void
+}
+class Administrator {
+  + manageCategory(category) : void
+  + configureDeadline(priority, hours) : void
+  + handleServiceComplaint(complaintId) : void
+  + viewDashboard() : void
+}
+class Complaint {
+  - complaintId : int
+  - title : String
+  - description : String
+  - photoPath : String
+  - priority : Priority
+  - status : ComplaintStatus
+  - createdAt : DateTime
+  - dueAt : DateTime
+  - resolvedAt : DateTime
+  - closedAt : DateTime
+  - escalationLevel : int
+  - reopenCount : int
+  + assignTo(assigneeId) : void
+  + updateStatus(newStatus) : void
+  + markResolved(remarks) : void
+  + confirm(rating, comment) : void
+  + reopen(reason) : void
+  + escalate() : Escalation
+  + autoClose() : void
+  + isOverdue(now) : boolean
+}
+class Category {
+  - categoryId : int
+  - name : String
+  - type : CategoryType
+  - defaultPriority : Priority
+  + getDefaultPriority() : Priority
+}
+class Location {
+  - locationId : int
+  - block : String
+  - floor : int
+  - room : String
+  - areaType : AreaType
+}
+class DeadlineRule {
+  - priority : Priority
+  - resolutionHours : int
+  - escalationIntervalHours : int
+  + calculateDueAt(start) : DateTime
+}
+class StatusUpdate {
+  - updateId : int
+  - fromStatus : ComplaintStatus
+  - toStatus : ComplaintStatus
+  - remarks : String
+  - updatedAt : DateTime
+}
+class Feedback {
+  - feedbackId : int
+  - isFixed : boolean
+  - rating : int
+  - comment : String
+  - givenAt : DateTime
+}
+class Escalation {
+  - escalationId : int
+  - level : int
+  - reason : String
+  - escalatedAt : DateTime
+  + notifyResponsible() : void
+}
+class Notification {
+  - notificationId : int
+  - message : String
+  - isRead : boolean
+  - sentAt : DateTime
+  + markRead() : void
+}
+enum ComplaintStatus <<enumeration>> {
+  SUBMITTED
+  INVALID
+  ASSIGNED
+  IN_PROGRESS
+  ON_HOLD
+  RESOLVED
+  REOPENED
+  ESCALATED
+  CLOSED
+}
+enum Priority <<enumeration>> {
+  CRITICAL
+  HIGH
+  MEDIUM
+  LOW
+}
+enum CategoryType <<enumeration>> {
+  INFRASTRUCTURE
+  SERVICE
+}
+enum AreaType <<enumeration>> {
+  HOSTEL
+  CLASSROOM
+  LAB
+  MESS
+  WASHROOM
+  COMMON_AREA
+}
+
+User <|-- CampusUser
+User <|-- MaintenanceStaff
+User <|-- MaintenanceSupervisor
+User <|-- Administrator
+CampusUser <|-- Student
+CampusUser <|-- Faculty
+User "1" -right-- "0..*" Notification : receives >
+CampusUser "1" -- "0..*" Complaint : raises >
+MaintenanceSupervisor "0..1" -- "0..*" Complaint : reviews >
+MaintenanceStaff "0..1" -- "0..*" Complaint : works on >
+Administrator "0..1" -- "0..*" Complaint : handles >
+Complaint "0..*" -right- "1" Category : belongs to >
+Complaint "0..*" -- "1" Location : reported at >
+Complaint "0..*" -- "1" DeadlineRule : governed by >
+Complaint "1" *-- "1..*" StatusUpdate : has >
+Complaint "1" *-- "0..*" Feedback : receives >
+Complaint "1" *-- "0..*" Escalation : has >
+Location -[hidden]down- ComplaintStatus
+DeadlineRule -[hidden]down- Priority
+StatusUpdate -[hidden]down- CategoryType
+Feedback -[hidden]down- AreaType
+@enduml

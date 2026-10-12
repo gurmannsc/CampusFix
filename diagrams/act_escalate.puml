@@ -1,0 +1,33 @@
+@startuml act_escalate
+!include style.iuml
+|CampusFix System|
+start
+:Run deadline check
+(every 15 minutes);
+:Fetch open complaints
+past due date;
+while () is ([overdue complaint left])
+  :Increase escalation level;
+  :Save escalation record;
+  if () then ([level 1])
+    :Notify supervisor;
+  else ([level 2 or above])
+    :Notify supervisor
+    and Administrator;
+  endif
+endwhile ([none left])
+|Maintenance Supervisor|
+:Review each escalated
+complaint;
+if () then ([staff unavailable])
+  :Reassign to
+  another staff member;
+else ([work needs more time])
+  :Extend due date
+  with reason;
+endif
+|CampusFix System|
+:Update due date
+and notify assignee;
+stop
+@enduml

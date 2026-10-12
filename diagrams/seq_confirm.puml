@@ -1,0 +1,42 @@
+@startuml seq_confirm
+!include seqstyle.iuml
+mainframe sd Confirm Resolution
+actor "reporter : CampusUser" as U
+participant "page : ComplaintDetailsPage" as P
+participant "ctrl : ResolutionController" as C
+participant "c : Complaint" as CP
+participant "ns : NotificationService" as N
+
+U -> P : respond(complaintId, isFixed,\nrating, comment)
+activate P
+P -> C : submitResponse(complaintId, isFixed,\nrating, comment)
+activate C
+create participant "f : Feedback" as FB
+C -->> FB : <<create>>(isFixed, rating, comment)
+alt isFixed = true
+  C -> CP : confirm(rating, comment)
+  activate CP
+  CP -> CP : updateStatus(CLOSED)
+  activate CP
+  deactivate CP
+  CP -->> C
+  deactivate CP
+  C -->> P : status = CLOSED
+else isFixed = false
+  C -> CP : reopen(comment)
+  activate CP
+  CP -> CP : updateStatus(REOPENED)
+  activate CP
+  deactivate CP
+  CP -->> C
+  deactivate CP
+  C -> N : send(supervisorId, "Complaint reopened")
+  activate N
+  N -->> C
+  deactivate N
+  C -->> P : status = REOPENED
+end
+deactivate C
+P -->> U : updated status
+deactivate P
+@enduml

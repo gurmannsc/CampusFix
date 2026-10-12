@@ -1,0 +1,44 @@
+@startuml seq_raise
+!include seqstyle.iuml
+mainframe sd Raise Complaint
+actor "reporter : CampusUser" as U
+participant "form : ComplaintForm" as F
+participant "ctrl : ComplaintController" as C
+participant "cat : Category" as CT
+participant "rule : DeadlineRule" as R
+participant "ns : NotificationService" as N
+
+U -> F : submit(categoryId, locationId,\ndescription, photo)
+activate F
+F -> C : raiseComplaint(details)
+activate C
+C -> C : validate(details)
+activate C
+deactivate C
+alt details invalid
+  C -->> F : validationErrors
+  F -->> U : validation errors
+else details valid
+  C -> CT : getDefaultPriority()
+  activate CT
+  CT -->> C : priority
+  deactivate CT
+  C -> R : calculateDueAt(now)
+  activate R
+  R -->> C : dueAt
+  deactivate R
+  create participant "c : Complaint" as CP
+  C -->> CP : <<create>>(details, priority, dueAt)
+  activate CP
+  CP -->> C : complaintId
+  deactivate CP
+  C -> N : send(supervisorId, "New complaint")
+  activate N
+  N -->> C
+  deactivate N
+  C -->> F : complaintId
+  F -->> U : complaintId
+end
+deactivate C
+deactivate F
+@enduml

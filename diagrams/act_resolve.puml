@@ -1,0 +1,45 @@
+@startuml act_resolve
+!include style.iuml
+|Maintenance Staff|
+start
+:Open assigned complaint;
+:Start work;
+|CampusFix System|
+:Set status to In Progress;
+|Maintenance Staff|
+repeat
+  if () then ([parts needed])
+    :Put complaint on hold;
+    :Wait for parts;
+  else ([parts available])
+  endif
+  :Repair the fault;
+repeat while () is ([fault persists]) not ([fault fixed])
+:Mark resolved
+with remarks;
+|CampusFix System|
+:Set status to Resolved;
+:Ask reporter to confirm;
+if () then ([no response in 48 hours])
+  :Auto-close complaint;
+else ([reporter responds])
+  |Campus User|
+  :Check the fix;
+  if () then ([not fixed])
+    :Reject with reason;
+    |CampusFix System|
+    :Reopen complaint;
+    :Notify supervisor;
+    stop
+  else ([fixed])
+    |Campus User|
+    :Confirm and
+    rate service;
+    |CampusFix System|
+    :Close complaint;
+  endif
+endif
+|CampusFix System|
+:Record resolution time;
+stop
+@enduml

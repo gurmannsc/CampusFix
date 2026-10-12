@@ -1,0 +1,51 @@
+@startuml act_raise
+!include style.iuml
+|Campus User|
+start
+:Log in;
+repeat
+  :Select category
+  and location;
+  :Describe the issue;
+  if () then ([photo available])
+    :Attach photo;
+  else ([no photo])
+  endif
+  :Submit complaint;
+  |CampusFix System|
+  :Validate details;
+repeat while () is ([invalid]) not ([valid])
+:Generate complaint ID;
+:Set priority and
+calculate due date;
+fork
+  :Notify supervisor;
+fork again
+  :Show complaint ID;
+end fork
+|Maintenance Supervisor|
+:Review complaint;
+if () then ([invalid or duplicate])
+  :Mark invalid
+  with reason;
+  |CampusFix System|
+  :Notify reporter;
+  stop
+else ([valid])
+  |Maintenance Supervisor|
+  :Confirm or
+  update priority;
+  if () then ([service])
+    :Route to
+    Administrator;
+  else ([infrastructure])
+    :Assign to
+    staff member;
+  endif
+endif
+|CampusFix System|
+:Set status to Assigned;
+:Notify assignee
+and reporter;
+stop
+@enduml

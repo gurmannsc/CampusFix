@@ -1,0 +1,14 @@
+!include style.iuml
+hide footbox
+skinparam sequenceParticipantBackgroundColor white
+skinparam sequenceParticipantBorderColor black
+skinparam sequenceLifeLineBorderColor black
+skinparam sequenceLifeLineBackgroundColor white
+skinparam sequenceGroupBackgroundColor white
+skinparam sequenceGroupBorderColor black
+skinparam sequenceGroupHeaderFontStyle bold
+skinparam sequenceMessageAlign left
+skinparam ParticipantPadding 8
+skinparam BoxPadding 5
+skinparam actorBackgroundColor white
+skinparam actorBorderColor black
