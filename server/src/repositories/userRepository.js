@@ -1,11 +1,16 @@
 // Data access for users. Returns domain objects (Student, MaintenanceStaff, ...), never raw rows.
 import { pool } from '../db.js';
 import { userFromRow } from '../domain/index.js';
+import { notificationRepository } from './notificationRepository.js';
+
+// Collaborators handed to every User object (see domain/User.js). Only what is wired so far;
+// an operation needing anything else says so with a clear error.
+const deps = { notificationRepository };
 
 export const userRepository = {
   async findById(userId) {
     const [rows] = await pool.query('SELECT * FROM users WHERE user_id = ?', [userId]);
-    return rows[0] ? userFromRow(rows[0]) : null;
+    return rows[0] ? userFromRow(rows[0], deps) : null;
   },
 
   // US-06: who may be offered for a complaint. INFRASTRUCTURE: staff whose trade equals the category
@@ -31,6 +36,6 @@ export const userRepository = {
   // users.email is UNIQUE and the column collation is case-insensitive.
   async findByEmail(email) {
     const [rows] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
-    return rows[0] ? userFromRow(rows[0]) : null;
+    return rows[0] ? userFromRow(rows[0], deps) : null;
   },
 };

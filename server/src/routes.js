@@ -10,6 +10,7 @@ import { ComplaintController } from './controllers/ComplaintController.js';
 import { AssignmentController } from './controllers/AssignmentController.js';
 import { ResolutionController } from './controllers/ResolutionController.js';
 import { AdminController } from './controllers/AdminController.js';
+import { NotificationController } from './controllers/NotificationController.js';
 
 export const router = Router();
 const handler = asyncHandler;
@@ -52,3 +53,7 @@ router.post('/complaints/:id/resolve-escalation', requireRole(...handlers), hand
 
 // M6: DEMO ONLY. Runs the deadline check now instead of waiting for the timer.
 router.post('/admin/run-deadline-check', requireRole(Role.ADMIN), handler(AdminController.runDeadlineCheck));
+
+// M7: in-app notifications of the logged-in user
+router.get('/notifications', authenticate, handler(NotificationController.list));
+router.post('/notifications/:id/read', authenticate, handler(NotificationController.markRead));

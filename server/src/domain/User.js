@@ -5,7 +5,7 @@
 // Operations that only apply domain rules (confirmResolution, updateWorkStatus, assignComplaint, ...)
 // are implemented here by calling the Complaint entity. Operations that need the database or a
 // report (raiseComplaint, viewNotifications, viewDashboard, ...) call a collaborator passed in as
-// `deps` (controllers/repositories, wired in app.js from M4 onwards).
+// `deps` (controllers/repositories, wired in repositories/userRepository.js).
 //
 // Where the diagram says `complaintId`, the operation accepts either a loaded Complaint or an id.
 // With an id it loads the complaint through deps.complaintRepository and saves it afterwards.
@@ -37,8 +37,9 @@ export class User {
   // Sessions are stateless JWTs, so logging out only means the client discards its token.
   logout() {}
 
-  viewNotifications() {
-    return this.collaborator('notificationRepository').findByUser(this.userId);
+  // options: { unreadOnly, limit } (optional; newest notifications first)
+  viewNotifications(options) {
+    return this.collaborator('notificationRepository').findByUser(this.userId, options);
   }
 
   // The "who" the state machine checks.
