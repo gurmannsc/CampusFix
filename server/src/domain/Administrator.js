@@ -6,13 +6,15 @@ export class Administrator extends User {
     return Role.ADMIN;
   }
 
-  // The three below are database / report operations, done by AdminController and ReportService.
+  // The three below are database / report operations, done by AdminService and ReportService.
+  // manageCategory: creates the category, or updates it when it has a categoryId.
   manageCategory(category) {
-    return this.collaborator('adminController').manageCategory(category);
+    return this.collaborator('adminService').manageCategory(category);
   }
 
-  configureDeadline(priority, hours) {
-    return this.collaborator('adminController').configureDeadline(priority, hours);
+  // `hours` is the DeadlineRule's resolutionHours; escalationIntervalHours is an optional extra.
+  configureDeadline(priority, hours, escalationIntervalHours) {
+    return this.collaborator('adminService').configureDeadline(priority, hours, escalationIntervalHours);
   }
 
   viewDashboard(filters) {

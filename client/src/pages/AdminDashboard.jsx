@@ -1,11 +1,13 @@
 // Administrator page with three tabs:
 //   Dashboard          US-10: resolution time, workload, deadline breaches, ratings, with filters (M9)
 //   Service complaints US-11: the mess and canteen complaints routed to the Administrator (M8)
+//   Manage             categories, locations, users and deadline rules
 //   Deadline check     DEMO ONLY: runs the timer's check now (M6 endpoint, M8 button)
 import { lazy, Suspense, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { api } from '../api.js';
 import { useLoad } from '../hooks.js';
+import AdminManage from '../components/AdminManage.jsx';
 import ComplaintList from '../components/ComplaintList.jsx';
 import { Message } from '../components/Badges.jsx';
 import { FINISHED, formatDateTime } from '../format.js';
@@ -13,7 +15,7 @@ import { FINISHED, formatDateTime } from '../format.js';
 // The charts library is large and only administrators need it, so the dashboard is loaded on demand.
 const Dashboard = lazy(() => import('../components/Dashboard.jsx'));
 
-const TABS = [['dashboard', 'Dashboard'], ['service', 'Service complaints'], ['check', 'Deadline check']];
+const TABS = [['dashboard', 'Dashboard'], ['service', 'Service complaints'], ['manage', 'Manage'], ['check', 'Deadline check']];
 
 export default function AdminDashboard() {
   const [tab, setTab] = useState('dashboard');
@@ -27,6 +29,7 @@ export default function AdminDashboard() {
       </div>
       {tab === 'dashboard' && <Suspense fallback={<p className="muted">Loading dashboard…</p>}><Dashboard /></Suspense>}
       {tab === 'service' && <ServiceComplaints />}
+      {tab === 'manage' && <AdminManage />}
       {tab === 'check' && <DeadlineCheck />}
     </>
   );

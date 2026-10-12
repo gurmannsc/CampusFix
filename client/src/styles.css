@@ -173,3 +173,10 @@ ul.plain li { padding: .35rem 0; border-bottom: 1px solid var(--line); }
 .dash .card { margin-bottom: 1rem; }
 .charts + .card { margin-top: 1rem; }
 details summary { cursor: pointer; }
+
+/* admin management */
+td.actions { white-space: nowrap; display: flex; gap: .4rem; flex-wrap: wrap; }
+td.actions button { padding: .3rem .6rem; font-size: .85rem; }
+td input[type=number] { width: 7rem; margin: 0; }
+.field-list { margin: .3rem 0 .8rem 1.2rem; color: var(--danger); }
+.card .form { margin-top: 1.2rem; padding-top: .5rem; border-top: 1px solid var(--line); }

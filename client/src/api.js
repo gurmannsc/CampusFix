@@ -50,6 +50,7 @@ export const api = {
   get: (path) => request('GET', path),
   post: (path, body = {}) => request('POST', path, body),
   patch: (path, body = {}) => request('PATCH', path, body),
+  delete: (path) => request('DELETE', path), // answers 204 with no body
 
   // Photos need the Authorization header, so they are fetched as a blob instead of used as <img src>.
   async photoBlob(complaintId) {

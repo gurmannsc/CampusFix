@@ -3,10 +3,11 @@ import { pool } from '../db.js';
 import { userFromRow } from '../domain/index.js';
 import { notificationRepository } from './notificationRepository.js';
 import { reportService } from '../services/ReportService.js';
+import { adminService } from '../services/AdminService.js';
 
 // Collaborators handed to every User object (see domain/User.js). Only what is wired so far;
 // an operation needing anything else says so with a clear error.
-const deps = { notificationRepository, reportService };
+const deps = { notificationRepository, reportService, adminService };
 
 export const userRepository = {
   async findById(userId) {

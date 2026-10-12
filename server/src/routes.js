@@ -60,3 +60,20 @@ router.post('/notifications/:id/read', authenticate, handler(NotificationControl
 
 // M9: administrator dashboard (US-10)
 router.get('/dashboard', requireRole(Role.ADMIN), handler(AdminController.dashboard));
+
+// Administrator management: categories, locations, users, deadline rules (docs/06)
+const admin = requireRole(Role.ADMIN);
+router.get('/admin/categories', admin, handler(AdminController.listCategories));
+router.post('/admin/categories', admin, handler(AdminController.createCategory));
+router.patch('/admin/categories/:id', admin, handler(AdminController.updateCategory));
+router.delete('/admin/categories/:id', admin, handler(AdminController.deleteCategory));
+router.get('/admin/locations', admin, handler(AdminController.listLocations));
+router.post('/admin/locations', admin, handler(AdminController.createLocation));
+router.patch('/admin/locations/:id', admin, handler(AdminController.updateLocation));
+router.delete('/admin/locations/:id', admin, handler(AdminController.deleteLocation));
+router.get('/admin/users', admin, handler(AdminController.listUsers));
+router.post('/admin/users', admin, handler(AdminController.createUser));
+router.patch('/admin/users/:id', admin, handler(AdminController.updateUser));
+router.delete('/admin/users/:id', admin, handler(AdminController.deleteUser));
+router.get('/admin/deadline-rules', admin, handler(AdminController.listDeadlineRules));
+router.patch('/admin/deadline-rules/:priority', admin, handler(AdminController.updateDeadlineRule));

@@ -260,13 +260,13 @@ describe('user operations apply the domain rules to a Complaint', () => {
     test('manageCategory, configureDeadline and viewDashboard delegate', async () => {
       const calls = [];
       const admin = adminUser({
-        adminController: { manageCategory: (c) => calls.push(['cat', c]), configureDeadline: (p, h) => calls.push(['rule', p, h]) },
+        adminService: { manageCategory: (c) => calls.push(['cat', c]), configureDeadline: (p, h, i) => calls.push(['rule', p, h, i]) },
         reportService: { dashboard: (f) => calls.push(['dash', f]) },
       });
       admin.manageCategory({ name: 'Roads' });
-      admin.configureDeadline('HIGH', 12);
+      admin.configureDeadline('HIGH', 12, 6);
       admin.viewDashboard({ block: 'A' });
-      expect(calls).toEqual([['cat', { name: 'Roads' }], ['rule', 'HIGH', 12], ['dash', { block: 'A' }]]);
+      expect(calls).toEqual([['cat', { name: 'Roads' }], ['rule', 'HIGH', 12, 6], ['dash', { block: 'A' }]]);
     });
   });
 });
