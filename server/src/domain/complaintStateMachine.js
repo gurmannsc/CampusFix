@@ -16,6 +16,7 @@ import { IllegalTransitionError, ForbiddenActionError, ValidationError } from '.
 
 export const AUTO_CLOSE_HOURS = 48; // docs/01: reporter has 48 h to respond to a RESOLVED complaint
 const HOUR_MS = 3600 * 1000;
+export const MAX_TEXT_LENGTH = 2000; // longest accepted description / reason / remarks / comment
 const hoursBetween = (later, earlier) => (new Date(later) - new Date(earlier)) / HOUR_MS;
 
 // ---- small helpers --------------------------------------------------------------------------
@@ -271,6 +272,12 @@ export function transition(event, { complaint, category, actor, payload = {}, no
   const candidates = TRANSITIONS.filter((t) => t.event === event);
   if (candidates.length === 0) throw new Error(`Unknown complaint event "${event}"`);
 
+  // Reject oversized text early (400) instead of letting the database refuse it later (500).
+  for (const [key, value] of Object.entries(payload)) {
+    if (typeof value === 'string' && value.length > MAX_TEXT_LENGTH) {
+      throw new ValidationError(`${key} is too long (at most ${MAX_TEXT_LENGTH} characters)`);
+    }
+  }
   // 1. status
   const row = candidates.find((t) => t.from.includes(complaint.status));
   if (!row) {
@@ -313,6 +320,7 @@ export function validateRaiseDetails(details = {}) {
   if (!Number.isInteger(categoryId) || categoryId <= 0) errors.categoryId = 'category is required';
   if (!Number.isInteger(locationId) || locationId <= 0) errors.locationId = 'location is required';
   if (isBlank(details.description)) errors.description = 'description is required';
+  else if (details.description.length > MAX_TEXT_LENGTH) errors.description = `description must be at most ${MAX_TEXT_LENGTH} characters`;
   if (details.title != null && typeof details.title !== 'string') errors.title = 'title must be text';
   if (typeof details.title === 'string' && details.title.length > 150) errors.title = 'title must be at most 150 characters';
   if (Object.keys(errors).length > 0) throw new ValidationError('Invalid complaint details', errors);

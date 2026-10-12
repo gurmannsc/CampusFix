@@ -27,6 +27,24 @@ export const pool = mysql.createPool({ ...connectionOptions(), connectionLimit: 
 // Runs on every new pooled connection, before it is handed out for queries.
 pool.pool.on('connection', (conn) => conn.query(`SET SESSION sql_mode = '${STRICT_SQL_MODE}'`));
 
+// Runs fn(conn) in one transaction: commit if it resolves, roll back if it throws. Everything that
+// changes a complaint (status, StatusUpdate rows, notifications) goes through one of these so a
+// failure half-way never leaves partial data.
+export async function withTransaction(fn) {
+  const conn = await pool.getConnection();
+  try {
+    await conn.beginTransaction();
+    const result = await fn(conn);
+    await conn.commit();
+    return result;
+  } catch (err) {
+    await conn.rollback();
+    throw err;
+  } finally {
+    conn.release();
+  }
+}
+
 export async function createConnection(overrides = {}) {
   const conn = await mysql.createConnection(connectionOptions(overrides));
   await conn.query(`SET SESSION sql_mode = '${STRICT_SQL_MODE}'`);

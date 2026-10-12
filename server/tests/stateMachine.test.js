@@ -468,3 +468,13 @@ describe('illegal transitions are rejected with HTTP 409', () => {
     expect(new IllegalTransitionError('x')).toBeInstanceOf(DomainError);
   });
 });
+
+describe('text length limit (keeps oversized input a 400 instead of a database error)', () => {
+  test('reason, remarks and comment over 2000 characters are rejected; 2000 is fine', () => {
+    const long = 'x'.repeat(2001);
+    expect(() => run('markInvalid', complaintIn('SUBMITTED'), supervisor, { reason: long })).toThrow(/reason is too long/);
+    expect(() => run('markResolved', complaintIn('IN_PROGRESS'), hvacStaff, { remarks: long })).toThrow(ValidationError);
+    expect(() => run('confirm', complaintIn('RESOLVED'), student, { rating: 5, comment: long })).toThrow(ValidationError);
+    expect(run('markInvalid', complaintIn('SUBMITTED'), supervisor, { reason: 'x'.repeat(2000) }).toStatus).toBe('INVALID');
+  });
+});
