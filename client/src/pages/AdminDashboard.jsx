@@ -1,6 +1,8 @@
-// Administrator page. This milestone (M8): the service complaints routed to the Administrator (US-11)
-// and the demo button that runs the deadline check now. The metrics dashboard is added in M9.
-import { useState } from 'react';
+// Administrator page with three tabs:
+//   Dashboard          US-10: resolution time, workload, deadline breaches, ratings, with filters (M9)
+//   Service complaints US-11: the mess and canteen complaints routed to the Administrator (M8)
+//   Deadline check     DEMO ONLY: runs the timer's check now (M6 endpoint, M8 button)
+import { lazy, Suspense, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { api } from '../api.js';
 import { useLoad } from '../hooks.js';
@@ -8,18 +10,37 @@ import ComplaintList from '../components/ComplaintList.jsx';
 import { Message } from '../components/Badges.jsx';
 import { FINISHED, formatDateTime } from '../format.js';
 
+// The charts library is large and only administrators need it, so the dashboard is loaded on demand.
+const Dashboard = lazy(() => import('../components/Dashboard.jsx'));
+
+const TABS = [['dashboard', 'Dashboard'], ['service', 'Service complaints'], ['check', 'Deadline check']];
+
 export default function AdminDashboard() {
+  const [tab, setTab] = useState('dashboard');
+  return (
+    <>
+      <h1>Administration</h1>
+      <div className="tabs" role="tablist" aria-label="Administration">
+        {TABS.map(([key, label]) => (
+          <button key={key} type="button" role="tab" aria-selected={tab === key} className={tab === key ? 'tab active' : 'tab'} onClick={() => setTab(key)}>{label}</button>
+        ))}
+      </div>
+      {tab === 'dashboard' && <Suspense fallback={<p className="muted">Loading dashboard…</p>}><Dashboard /></Suspense>}
+      {tab === 'service' && <ServiceComplaints />}
+      {tab === 'check' && <DeadlineCheck />}
+    </>
+  );
+}
+
+function ServiceComplaints() {
   const location = useLocation();
-  const { data, error, loading, reload } = useLoad(() => api.get('/complaints'), [location.key]);
+  const { data, error, loading } = useLoad(() => api.get('/complaints'), [location.key]);
   const service = (data?.complaints ?? []).filter((c) => c.category.type === 'SERVICE');
   const active = service.filter((c) => !FINISHED.includes(c.status));
   const finished = service.filter((c) => FINISHED.includes(c.status));
 
   return (
     <>
-      <h1>Administration</h1>
-      <DeadlineCheck onDone={reload} />
-
       <section className="card">
         <h2>Service complaints (mess and canteen)</h2>
         <p className="muted">These come to you, not to maintenance staff. Open one to take it, work on it and resolve it.</p>
@@ -39,7 +60,7 @@ export default function AdminDashboard() {
 
 // DEMO ONLY: POST /api/admin/run-deadline-check runs the same check the timer runs, right now,
 // and shows what it did (escalations, repeat escalations, auto-closes).
-function DeadlineCheck({ onDone }) {
+function DeadlineCheck() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
@@ -49,7 +70,6 @@ function DeadlineCheck({ onDone }) {
     setError('');
     try {
       setResult(await api.post('/admin/run-deadline-check'));
-      onDone();
     } catch (err) {
       setError(err.message);
     } finally {

@@ -53,3 +53,12 @@ export function parseComplaintFilters(query) {
   if (Object.keys(errors).length) throw new ValidationError('Invalid filters', errors);
   return filters;
 }
+
+// Query-string filters of GET /api/dashboard: category (id or name), block, from, to.
+// Same rules and messages as the complaint list; any other parameter is ignored.
+export function parseDashboardFilters(query) {
+  const { category, block, from, to } = parseComplaintFilters({
+    category: query.category, block: query.block, from: query.from, to: query.to,
+  });
+  return { category, block, from, to };
+}

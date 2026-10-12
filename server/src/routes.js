@@ -57,3 +57,6 @@ router.post('/admin/run-deadline-check', requireRole(Role.ADMIN), handler(AdminC
 // M7: in-app notifications of the logged-in user
 router.get('/notifications', authenticate, handler(NotificationController.list));
 router.post('/notifications/:id/read', authenticate, handler(NotificationController.markRead));
+
+// M9: administrator dashboard (US-10)
+router.get('/dashboard', requireRole(Role.ADMIN), handler(AdminController.dashboard));
