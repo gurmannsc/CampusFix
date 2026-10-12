@@ -20,6 +20,17 @@ function assertHandler(user, complaint) {
   }
 }
 
+// The person a complaint is being assigned to: the staffId from the request, or (for an
+// Administrator who leaves it out) themselves, which is how SERVICE complaints are taken (US-11).
+async function loadAssignee(staffId, user) {
+  if (staffId == null && user.role === Role.ADMIN) return user;
+  const staffUserId = Number(staffId);
+  if (staffId == null || !Number.isInteger(staffUserId) || staffUserId <= 0) throw new ValidationError('staffId is required');
+  const assignee = await userRepository.findById(staffUserId);
+  if (!assignee) throw new DomainError('Staff member not found', 404);
+  return assignee;
+}
+
 export const AssignmentController = {
   // PATCH /api/complaints/:id/priority   {priority}   US-05: dueAt is recalculated from createdAt
   async setPriority(req, res) {
@@ -51,17 +62,21 @@ export const AssignmentController = {
     const id = parseId(req.params.id);
     const { staffId } = req.body ?? {};
     await updateComplaint(id, async (complaint) => {
-      let assignee;
-      if (staffId == null && req.user.role === Role.ADMIN) {
-        assignee = req.user;
-      } else {
-        const staffUserId = Number(staffId);
-        if (staffId == null || !Number.isInteger(staffUserId) || staffUserId <= 0) throw new ValidationError('staffId is required');
-        assignee = await userRepository.findById(staffUserId);
-        if (!assignee) throw new DomainError('Staff member not found', 404);
-      }
+      const assignee = await loadAssignee(staffId, req.user);
       // Throws 409 (wrong status, wrong trade, unavailable, SERVICE to staff) or 403 (wrong person).
       complaint.assignTo(assignee, req.user.ctx());
+    });
+    res.json({ complaint: await complaintRepository.findDetails(id) });
+  },
+
+  // POST /api/complaints/:id/resolve-escalation   row 14, ESCALATED -> ASSIGNED
+  //   {action: "reassign", staffId}  or  {action: "extend", newDueAt, reason}
+  async resolveEscalation(req, res) {
+    const id = parseId(req.params.id);
+    const { action, staffId, newDueAt, reason } = req.body ?? {};
+    await updateComplaint(id, async (complaint) => {
+      const staff = action === 'reassign' ? await loadAssignee(staffId, req.user) : undefined;
+      complaint.applyEvent('resolveEscalation', { action, staff, newDueAt, reason }, req.user.ctx());
     });
     res.json({ complaint: await complaintRepository.findDetails(id) });
   },

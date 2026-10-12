@@ -8,6 +8,7 @@ import { Role, CAMPUS_USER_ROLES } from './domain/index.js';
 import { AuthController } from './controllers/AuthController.js';
 import { ComplaintController } from './controllers/ComplaintController.js';
 import { AssignmentController } from './controllers/AssignmentController.js';
+import { ResolutionController } from './controllers/ResolutionController.js';
 
 export const router = Router();
 const handler = asyncHandler;
@@ -35,3 +36,15 @@ router.patch('/complaints/:id/priority', requireRole(...handlers), handler(Assig
 router.get('/complaints/:id/eligible-staff', requireRole(...handlers), handler(AssignmentController.eligibleStaff));
 router.post('/complaints/:id/assign', requireRole(...handlers), handler(AssignmentController.assign));
 router.post('/complaints/:id/invalid', requireRole(...handlers), handler(AssignmentController.markInvalid));
+
+// M5: staff workflow (the assignee; administrators act as assignee for SERVICE complaints),
+// the reporter's confirm / reject, and resolving an escalation. The state machine decides who
+// exactly may act (e.g. only THE assignee), so these role checks only keep out everyone else early.
+const workers = [Role.STAFF, Role.ADMIN];
+router.post('/complaints/:id/start', requireRole(...workers), handler(ResolutionController.start));
+router.post('/complaints/:id/hold', requireRole(...workers), handler(ResolutionController.hold));
+router.post('/complaints/:id/resume', requireRole(...workers), handler(ResolutionController.resume));
+router.post('/complaints/:id/resolve', requireRole(...workers), handler(ResolutionController.resolve));
+router.post('/complaints/:id/confirm', requireRole(...CAMPUS_USER_ROLES), handler(ResolutionController.confirm));
+router.post('/complaints/:id/reject', requireRole(...CAMPUS_USER_ROLES), handler(ResolutionController.reject));
+router.post('/complaints/:id/resolve-escalation', requireRole(...handlers), handler(AssignmentController.resolveEscalation));
